@@ -7,6 +7,7 @@
 }
 
 #controls {
+    width: 20%;
     position: absolute;
     bottom: 10px;
     right: 10px;
@@ -77,4 +78,9 @@
     padding: 5px;
     border-radius: 5px;
     cursor: pointer;
+}
+
+.sidebar {
+    heigth: 80%;
+
 }
