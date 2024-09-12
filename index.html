@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Litchi Grid Generator</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+    <script src="https://bowz0n.github.io/GridMissionBuilder/js/turf.min.js"></script>
+    <script src="https://unpkg.com/chroma-js@2.1.0/chroma.min.js"></script>
+</head>
+<body>
+    <div id="map"></div>    
+    <div id="controls">
+        
+        <button id="drawPolygon" class="custom-button">Dessiner un Polygone</button>
+        <button id="takeOffBtn" class="custom-button">Place TakeOff Point</button>
+
+        <select id="modeSelector">
+            <option value="manual">Manuel</option>
+            <option value="auto" selected>Automatique</option>
+        </select>
+        
+        <!-- Mode Auto -->
+        <div class="mode" id="autoMode">
+            <select id="droneModelSelector">
+                <option value="DJI Mavic 3 E">DJI Mavic 3 E</option>
+                <option value="DJI Mini 3 Pro">DJI Mini 3 Pro</option>
+                <option value="DJI Mini 2">DJI Mini 2</option>
+                <option value="DJI Mavic Mini">DJI Mavic Mini</option>
+                <option value="DJI Mavic Mini">DJI Mavic Mini</option>
+                <option value="DJI Mini SE">DJI Mini SE</option>
+                <option value="DJI Air 2S">DJI Air 2S</option>
+                <option value="DJI Mavic Air">DJI Mavic Air</option>
+                <option value="DJI Mavic Air 2">DJI Mavic Air 2</option>
+                <option value="DJI Mavic 2 Pro">DJI Mavic 2 Pro</option>
+                <option value="DJI Mavic 2 Zoom">DJI Mavic 2 Zoom</option>
+                <option value="DJI Phantom 3">DJI Phantom 3</option>
+                <option value="DJI Phantom 4">DJI Phantom 4</option>
+                <option value="DJI Phantom 4 Pro / 2.0 / Advanced">DJI Phantom 4 Pro / 2.0 / Advanced</option>
+            </select>
+    
+            <!-- Slider pour Altitude -->
+            <div class="slider-container">
+                <label for="altitudeSlider">Altitude (m):</label>
+                <div class="value-container">
+                    <span id="altitudeValue" class="displayValue">50</span>
+                </div>
+                <input type="range" id="altitudeSlider" min="10" max="120" value="50" class="slider">
+            </div>
+    
+            <!-- Slider pour Recouvrement Horizontal -->
+            <div class="slider-container">
+                <label for="overlapHSlider">Recouvrement Horizontal (%):</label>
+                <div class="value-container">
+                    <span id="overlapHValue" class="displayValue">70</span>
+                </div>
+                <input type="range" id="overlapHSlider" min="10" max="90" value="70" class="slider">
+            </div>
+    
+            <!-- Slider pour Recouvrement Vertical -->
+            <div class="slider-container">
+                <label for="overlapVSlider">Recouvrement Vertical (%):</label>
+                <div class="value-container">
+                    <span id="overlapVValue" class="displayValue">70</span>
+                </div>
+                <input type="range" id="overlapVSlider" min="10" max="90" value="70" class="slider">
+            </div>    
+            
+        </div>
+    
+        <!-- Mode Manuel -->
+        <div class="mode" id="manualMode">
+            <div class="slider-container">
+                <label for="spacing">Grid Spacing (m):</label>
+                <div class="value-container">
+                    <span id="spacingValue" class= "displayValue">50</span> <!-- Affichage dynamique de la valeur -->
+                </div>
+                <input type="range" id="spacingSlider" min="0" max="100" value="50" class="slider">        
+            </div>            
+            
+            <div class="slider-container">
+                <label for="density">Density:</label>
+                <div class="value-container">
+                    <span id="densityValue" class= "displayValue">20</span> <!-- Affichage dynamique de la valeur -->
+                </div>
+                <input type="range" id="densitySlider" min="1" max="100" value="20" class="slider">        
+            </div>.
+
+            <div class="slider-container">
+                <label for="height">Height Above Ground (m):</label>
+                <div class="value-container">
+                    <span id="heightValue" class= "displayValue">60</span> <!-- Affichage dynamique de la valeur -->
+                </div>
+                <input type="range" id="heightSlider" min="1" max="120" value="60" class="slider">        
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="slider-container">
+            <label for="orientation">Orientation (degrees):</label>
+            <div class="value-container">
+                <span id="orientationValue" class= "displayValue">0</span> <!-- Affichage dynamique de la valeur -->
+            </div>
+            <input type="range" id="orientationSlider" min="0" max="360" value="0" class="slider">        
+        </div>
+
+        <!-- Slider pour le décalage des lignes -->
+        <div class="slider-container">
+            <label for="lineOffsetSlider">Décalage des Lignes (m):</label>
+            <div class="value-container">
+                <span id="lineOffsetValue" class="displayValue">10</span>
+            </div>
+            <input type="range" id="lineOffsetSlider" min="0" max="50" value="10" class="slider">
+        </div>
+
+        <hr>
+    
+        <input type="file" id="tiffInput" accept=".tiff,.tif">        
+        <button id="exportCsvBtn">Export Points to CSV</button>
+    </div>
+    
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+    <script src="https://unpkg.com/leaflet-pip@1.1.0/leaflet-pip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/georaster@1.6.0/dist/georaster.browser.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/georaster-layer-for-leaflet@3.10.0/dist/v3/webpack/bundle/georaster-layer-for-leaflet.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/geoblaze@2.7.0/dist/geoblaze.web.min.js"></script>
+    <script src="script.js"></script>
+    <script src="addTiff.js"></script>
+    <script src="exportCsv.js"></script>
+</body>
+</html>
